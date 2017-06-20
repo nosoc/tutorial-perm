@@ -18,7 +18,7 @@ library(reshape2)
 Загрузка данных
 
 ```{r}
-load("~/tutorial_data.rda")
+load("tutorial_data.rda")
 ```
 
 Выбираем колонку с оценками и пользователями, сделаем матрицу.
@@ -106,6 +106,7 @@ model_details$sim[1:5, 1:5]
 
 ```{r}
 recc_predicted <- predict(object = recc_model, newdata = recc_data_test, n = 6)
+
 recc_predicted
 ```
 
@@ -123,7 +124,7 @@ str(recc_predicted)
 
 Рекомендации для первого пользователя
 ```{r}
-recc_user_1 <- recc_predicted@items[[15]]
+recc_user_1 <- recc_predicted@items[[1]]
 recc_user_1
 ```
 
@@ -143,21 +144,25 @@ names_movies_user_1
 
 # Рекомендации основанные на содержании
 
+Для этой части нам потребуется объект movie_metadata
+
 ```{r}
 library(tidytext)
-movie_metadata = movie_metadata %>% select(movie_title,genres)
-movie_metadata = movie_metadata[!duplicated(movie_metadata),]
-movie_metadata$genres = movie_metadata$genres %>% str_replace_all(regex(" |-"),"") %>%  str_replace_all(fixed("|")," ")
-movie_metadata$id = 1:nrow(movie_metadata)
-movie_metadata = movie_metadata %>% unnest_tokens(genres,genres)
-movie_metadata$is_g = 1
-movie_metadata = movie_metadata %>% spread(genres,is_g,fill=0)
+load("tutorial_data.rda")
+movies = movie_metadata
+movies = movies %>% select(movie_title,genres)
+movies = movies[!duplicated(movies),]
+movies$genres = movies$genres %>% str_replace_all(regex(" |-"),"") %>%  str_replace_all(fixed("|")," ")
+movies$id = 1:nrow(movies)
+movies = movies %>% unnest_tokens(genres,genres)
+movies$is_g = 1
+movies = movies %>% spread(genres,is_g,fill=0)
 ```
 
 Возьмем небольшой кусочек данных, потому что на всех фильмах будет долго считаться.
 
 ```{r}
-movie_rec = movie_metadata[sample(nrow(movie_metadata), 1000),]
+movie_rec = movies[sample(nrow(movies), 1000),]
 rownames(movie_rec) = movie_rec$movie_title
 movie_rec$movie_title = NULL
 movie_rec$id = NULL
