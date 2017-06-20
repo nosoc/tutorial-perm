@@ -12,8 +12,8 @@ library(RColorBrewer)
 library(tidyr)
 library(stringr)
 library(dplyr)
-load("~/shared/minor2_2016/2-datatech/lab05-text-2/reviews.rda")
-stop_words = read.table("~/shared/minor2_2016/2-datatech/lab05-text-2/stopwords_ru.txt")
+load("./reviews.rda")
+stop_words = read.table("./stopwords_ru.txt")
 stop_words$V1 = stop_words$V1 %>% as.character() %>% str_trim()
 names(stop_words)[1] = "word"
 rev.df$review = removeNumbers(rev.df$review)
@@ -124,7 +124,7 @@ wordcloud(stars5$word,stars5$n,min.freq = 180, scale=c(0.5,4), colors = brewer.p
 Пакет quanteda работает аналогичным образом с tidytext, только он считает не все слова, а те, которые мы задаём им. На этом этапе мы загружаем результаты тематической модели. Тематическая модель выделила группы слов, которые часто встречаются вместе, мы составили из них "темы" отзывов. Для каждой темы мы знаем топ-20 слов. Давайте посмотрим, различаются ли отели с разными звездами на уровне тем.
 ```{r}
 library(quanteda)
-topic.words = read.csv("~/shared/minor2_2016/2-datatech/lab05-text-2/hotels_topic_words.csv") # загрузка слов
+topic.words = read.csv("./hotels_topic_words.csv") # загрузка слов
 topic.words %>% group_by(topic) %>% count(sort=T)
 placement = filter(topic.words,topic=="расположение") # фильтруем по теме расположение
 placement = placement$top_words %>% as.character() %>% strsplit(split = " ") # делаем вектор из текстового значения, где пробелы между словами
@@ -210,7 +210,7 @@ bigrams %>% top_n(10) %>%
 Здесь мы загружаем базу данных по обсуждениям косметических предметов
 Сначала небольшая обработка текста, чтобы мы нормально считали слова
 ```{r}
-load("~/shared/minor2_2016/2-datatech/lab05-text-2/item_disc.rda")
+load("./item_disc.rda")
 texts$text = str_replace_all(texts$text,fixed("\n")," ")
 texts$text = str_replace_all(texts$text,regex(" +")," ")
 texts$text = str_replace_all(texts$text,regex("http:[:graph:]*( |\\))"),"LINK")
